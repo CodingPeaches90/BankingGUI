@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<script>
+
+
+</script>
+<html lang="en">
+<!--
+We used a template from this source, page is modified to suit our needs
+sourced here : https://startbootstrap.com/template-overviews/simple-sidebar/
+-->
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Banking API</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+</head>
+<script>
+  //Grab Local storage
+/* User details */
+var id = localStorage.getItem('userID');
+var fname = localStorage.getItem('Customer Fname');
+var lname = localStorage.getItem('Customer Lname');
+var address = localStorage.getItem('Customer Address');
+var ppsn = localStorage.getItem('CustomerPPSN');
+var sort = localStorage.getItem('CustomerSortCode');
+
+console.log(address + fname);
+
+</script>
+
+<body>
+
+
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <h4 id="welcomemessage" style="color:white;"></h4>
+          <script>
+            document.getElementById("welcomemessage").innerHTML = fname + " " + lname;
+                  </script>
+
+
+        </li>
+        <li>
+          <a href="index.html" class="active">My Details</a>
+        </li>
+        <li>
+          <a href="account.html">My Account</a>
+        </li>
+        <li>
+          <a href="transaction.html">My Transactions</a>
+        </li>
+        <br />
+        <li>
+          <button type="button" class="btn btn-light" id="logout">LOG OUT</button>
+
+        </li>
+        <script>
+          // Clear local storage first then redirect to login
+
+                document.getElementById("logout").onclick = function(){
+                  clearLocalAndLogOut();
+                }
+                function clearLocalAndLogOut(){
+                  localStorage.clear();
+                  window.location.replace("login.html");
+                }
+
+                </script>
+      </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+
+
+        <table class="table table-striped table-dark">
+          <thead>
+            <tr>
+              <th scope="col">My Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"></th>
+              <td>Name : </td>
+              <td id="customername"></td>
+            </tr>
+            <tr>
+
+              <th scope="row"></th>
+              <td>Address : </td>
+
+              <td id="customerAddress"></td>
+            </tr>
+            <tr>
+              <th scope="row"></th>
+              <td>PPSM : </td>
+
+              <td id="customerPPSN"></td>
+            </tr>
+            <tr>
+              <th scope="row"></th>
+              <td>Sort Code : </td>
+
+              <td id="customerSortCode"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- form field for update method -->
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <h1 class="display-4">Update Your Details</h1>
+          <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+          <!-- buttons for update details -->
+          <form id="test" action="#" method="post">
+            <div class="form-group">
+              <label for="uid">First Name</label>
+              <input type="text" class="form-control" id="fname" name="customerFName" placeholder="Enter uid" value="">
+            </div>
+            <div class="form-group">
+              <label for="uid">Last Name</label>
+              <input type="text" class="form-control" id="lname" name="customerLName" placeholder="Enter uid">
+            </div>
+            <div class="form-group">
+              <label for="uid">Address</label>
+              <input type="text" class="form-control" id="address" name="customerAddress" placeholder="Enter uid">
+            </div>
+            <div class="form-group">
+              <label for="uid">PPSN</label>
+              <input type="text" class="form-control" id="ppsn" name="customerPPSN" placeholder="Enter uid">
+            </div>
+            <div class="form-group">
+              <label for="uid">Sort Code</label>
+              <input type="text" class="form-control" id="sortcode" name="customerSortCode" placeholder="Enter uid">
+            </div>
+
+            <div class="form-group">
+              <label for="uid">UID</label>
+              <input type="text" class="form-control" id="uid" placeholder="Enter uid">
+            </div>
+            <div class="form-group">
+            </div>
+            <!--<button id="submit" type="submit" class="btn btn-primary">Get Details</button>-->
+            <p>
+              <input type="submit" value="Send" class="btn btn-primary btn-block" />
+            </p>
+            <pre id="output"></pre>
+
+          </form>
+        </div>
+      </div>
+      <script>
+        /* TRIGGER THE PUT REQUEST */
+          /*code is here : https://codepen.io/gabrieleromanato/pen/LpLVeQ*/
+          (function() {
+        	function toJSONString( form ) {
+        		var obj = {};
+        		var elements = form.querySelectorAll( "input" );
+        		for( var i = 0; i < elements.length; ++i ) {
+        			var element = elements[i];
+        			var name = element.name;
+        			var value = element.value;
+
+        			if( name ) {
+        				obj[ name ] = value;
+        			}
+        		}
+            // turn string to id
+            obj.customerUID = parseInt(id);
+        		return JSON.stringify( obj );
+        	}
+
+        	document.addEventListener( "DOMContentLoaded", function() {
+        		var form = document.getElementById( "test" );
+        		var output = document.getElementById( "output" );
+        		form.addEventListener( "submit", function( e ) {
+        			e.preventDefault();
+        			var json = toJSONString( this );
+              var tempId = id;
+
+              console.log(json);
+              $.ajax({
+                 url: "http://localhost:49000/api/customer/update",
+                 type: "PUT",
+                 data: json,
+                 dataType: "json",
+                 contentType: "application/json;",
+                 success: function (result) {
+                   swal({
+                      title: "You Updated your account, you will be logged out now",
+                    }).then(function(){
+                      clearLocalAndLogOut();
+
+                      window.location.replace("login.html");
+                    });
+
+              }});
+        		}, false);
+        	});
+        })();
+
+
+          </script>
+
+      <!-- DELETE ACCOUNT -->
+      <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <form id="deleteaccounnt" action="#" method="post">
+            <button type="submit" class="btn btn-danger btn-lg btn-block">Delete Account</button>
+          </form>
+        </div>
+      </div>
+      <script>
+        // Delete account request
+        function toJSONString2() {
+          var obj = {};
+          obj.customerUID = parseInt(id);
+
+          return JSON.stringify(obj);
+        }
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+          var button = document.getElementById("deleteaccounnt");
+          button.addEventListener("submit", function(e) {
+            e.preventDefault();
+            var json = toJSONString2();
+            var tempId = id;
+            console.log(json);
+            $.ajax({
+              url: "http://localhost:49000/api/customer/delete",
+              type: "DELETE",
+              data: json,
+              dataType: "json",
+              contentType: "application/json;",
+              success: function(result) {
+                swal({
+                  title: "You Deleted your Account!",
+                }).then(function() {
+                  clearLocalAndLogOut();
+
+                  window.location.replace("login.html");
+                });
+
+              }
+            });
+          }, false);
+        });
+      </script>
+
+
+    </div>
+    <script>
+      /* populate the mydetails section */
+      document.getElementById("customername").innerHTML = fname + " " + lname;
+      document.getElementById("customerAddress").innerHTML = address;
+      document.getElementById("customerPPSN").innerHTML = ppsn;
+      document.getElementById("customerSortCode").innerHTML = sort;
+
+      /*
+        Populate the update section form
+      */
+      document.getElementById("fname").value = fname;
+      document.getElementById("lname").value = lname;
+      document.getElementById("address").value = address;
+      document.getElementById("ppsn").value = ppsn;
+      document.getElementById("sortcode").value = sort;
+      document.getElementById("uid").value = id;
+    </script>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Menu Toggle Script -->
+  <!-- always on -->
+  <script>
+    $(function() {
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+
+</body>
+
+</html>

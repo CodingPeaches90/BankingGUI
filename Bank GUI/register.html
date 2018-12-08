@@ -1,0 +1,109 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+</head>
+
+
+
+<div class="jumbotron vertical-center">
+  <h1 class="display-4">Register</h1>
+  <form id="test" action="#" method="post">
+    <div class="form-group">
+      <label for="name">First Name</label>
+      <input class="form-control" type="text" name="customerFName" id="customerFName" />
+    </div>
+    <div class="form-group">
+      <label for="name">Last Name</label>
+      <input class="form-control" type="text" name="customerLName" id="customerLName" />
+    </div>
+    <div class="form-group">
+      <label for="name">Address</label>
+      <input class="form-control" type="text" name="customerAddress" id="customerAddress" />
+    </div>
+    <div class="form-group">
+      <label for="name">PPSN</label>
+      <input class="form-control" type="text" name="customerPPSN" id="customerPPSN" />
+    </div>
+    <div class="form-group">
+      <label for="name">Sort Code</label>
+      <input class="form-control" type="text" name="customerSortCode" id="customerSortCode" />
+    </div>
+    <p>
+      <input type="submit" value="Send" class="btn btn-primary btn-block" />
+    </p>
+  </form>
+  <pre id="output"></pre>
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<script>
+  /*code is here : https://codepen.io/gabrieleromanato/pen/LpLVeQ*/
+  (function() {
+    function toJSONString(form) {
+      var obj = {};
+      var elements = form.querySelectorAll("input");
+      for (var i = 0; i < elements.length; ++i) {
+        var element = elements[i];
+        var name = element.name;
+        var value = element.value;
+
+        if (name) {
+          obj[name] = value;
+        }
+      }
+
+      return JSON.stringify(obj);
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      var form = document.getElementById("test");
+      var output = document.getElementById("output");
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        var json = toJSONString(this);
+        //output.innerHTML = json;
+        /*
+        var i = {
+              "customerAddress": "f",
+              "customerLName": "f",
+              "customerFName": "l",
+              "customerPPSN":"3d"
+
+          };
+          var dataJson = JSON.stringify(i);
+          console.log(dataJson);*/
+
+
+        $.ajax({
+          url: "http://localhost:49000/api/customer/create",
+          type: "POST",
+          data: json,
+          dataType: "json",
+          contentType: "application/json;",
+          success: function(result) {
+            swal({
+              title: "You created an account",
+            }).then(function() {
+              window.location.replace("login.html");
+            });
+          }
+        });
+
+
+      }, false);
+
+    });
+
+  })();
+</script>
+<p id="someContainer"></p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</html>

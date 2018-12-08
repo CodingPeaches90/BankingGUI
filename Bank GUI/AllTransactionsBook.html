@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<script>
+
+
+</script>
+<html lang="en">
+<!--
+sourced here : https://startbootstrap.com/template-overviews/simple-sidebar/
+-->
+
+<head>
+
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Banking API</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+</head>
+
+<script type="text/javascript">
+  var fname = localStorage.getItem('Customer Fname');
+  var lname = localStorage.getItem('Customer Lname');
+  /* GET all Transactions*/
+  var request = new XMLHttpRequest();
+  var url = "http://localhost:49000/api/transaction";
+  request.open('GET', url, true);
+  request.onload = function() {
+    var data = JSON.parse(this.response);
+    if (request.status >= 200 && request.status < 400) {
+      console.log(data);
+      popTable(data);
+    }
+  }
+  request.send();
+</script>
+
+<body>
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <h4 id="welcomemessage" style="color:white;"></h4>
+          <script>
+            document.getElementById("welcomemessage").innerHTML = fname + " " + lname;
+          </script>
+
+        </li>
+        <li>
+          <a href="index.html" class="active">My Details</a>
+        </li>
+        <li>
+          <a href="account.html">My Account</a>
+        </li>
+        <li>
+          <a href="transaction.html">My Transactions</a>
+        </li>
+        <li>
+          <a href="AllTransactionsBook.html" class="active">All Transactions</a>
+        </li>
+        <br />
+        <li>
+          <button type="button" class="btn btn-light" id="logout">LOG OUT</button>
+
+        </li>
+        <script>
+          // Clear local storage first then redirect to login
+          document.getElementById("logout").onclick = function() {
+            clearLocalAndLogOut();
+          }
+
+          function clearLocalAndLogOut() {
+            localStorage.clear();
+            window.location.replace("login.html");
+          }
+        </script>
+      </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">TID</th>
+              <th scope="col">To</th>
+              <th scope="col">From</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Date</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <tr>
+                  <th scope="row">1</th>
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>@mdo</td>
+                </tr> -->
+            <script>
+              function popTable(data) {
+                //console.log(data);
+                for (var dataItem in data) {
+                  var item = data[dataItem];
+                  console.log(item);
+                  // insert into relevant fields in our table
+                  $('table').append('<tr><td>' + data[dataItem].transactionID + '</td><td>' + data[dataItem].transactionTo + '</td><td>' + data[dataItem].transactionFrom + '</td><td>' + data[dataItem].amount + '</td><td>' + data[dataItem].transactionDate +
+                    '</td><td>' + data[dataItem].type + '</td></tr>');
+                }
+              }
+            </script>
+          </tbody>
+        </table>
+      </div><!-- end of fluid container containing the table -->
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Menu Toggle Script -->
+    <!-- always on -->
+    <script>
+      $(function() {
+        $("#wrapper").toggleClass("toggled");
+      });
+    </script>
+
+</body>
+
+</html>

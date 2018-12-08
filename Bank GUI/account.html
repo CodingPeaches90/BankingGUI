@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<script>
+
+
+</script>
+<html lang="en">
+<!--
+sourced here : https://startbootstrap.com/template-overviews/simple-sidebar/
+-->
+
+<head>
+
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Banking API</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+</head>
+<script>
+  /*
+    Load everything from local storage into the individual accounts
+    Now we have are two accounts on one page.
+*/
+/* GET Account by UID */
+var idvar = document.getElementById("form1");
+var fname = localStorage.getItem('Customer Fname');
+var lname = localStorage.getItem('Customer Lname');
+
+var request = new XMLHttpRequest();
+var customerUID = localStorage.getItem('userID');
+var url = "http://localhost:49000/api/account/uid/"+customerUID;
+console.log(url);
+request.open('GET', url ,true);
+request.onload = function() {
+  var data = JSON.parse(this.response);
+  if (request.status >= 200 && request.status < 400) {
+    /*Store account information in localstorage*/
+    var firstAccountNo = data.accountNo;
+    var customerID = data.customerID;
+    var firstAccountType = data.accountType;
+    var firstBalance = data.balance;
+
+    localStorage.setItem('First Account Number', firstAccountNo);
+    localStorage.setItem('customerID', customerID);
+    localStorage.setItem('First Account Type', firstAccountType);
+    localStorage.setItem('First Balance', firstBalance);
+
+    document.getElementById("accountnumber").innerHTML = firstAccountNo;
+    document.getElementById("customerID").innerHTML = customerID;
+    document.getElementById("accountType").innerHTML = firstAccountType;
+    document.getElementById("balance").innerHTML = firstBalance;
+    //unrelated to account details
+
+  }
+}
+request.send();
+
+/* Customer Details */
+var id = localStorage.getItem('userID');
+var fname = localStorage.getItem('Customer Fname');
+var lname = localStorage.getItem('Customer Lname');
+
+
+/* Account Details */
+var firstAccountNo = localStorage.getItem('First Account Number');
+var customerID = localStorage.getItem('customerID');
+var firstAccountType = localStorage.getItem('First Account Type');
+var firstBalance = localStorage.getItem('First Balance');
+
+
+
+</script>
+
+<body>
+
+
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <h4 id="welcomemessage" style="color:white;"></h4>
+          <script>
+            document.getElementById("welcomemessage").innerHTML = fname + " " + lname;
+          </script>
+
+        </li>
+        <li>
+          <a href="index.html" class="active">My Details</a>
+        </li>
+        <li>
+          <a href="account.html">My Account</a>
+        </li>
+        <li>
+          <a href="transaction.html">My Transactions</a>
+        </li>
+        <li>
+          <a href="AllTransactionsBook.html" class="active">All Transactions</a>
+        </li>
+        <br />
+        <li>
+          <button type="button" class="btn btn-light" id="logout">LOG OUT</button>
+
+        </li>
+        <script>
+          // Clear local storage first then redirect to login
+
+          document.getElementById("logout").onclick = function() {
+            clearLocalAndLogOut();
+          }
+
+          function clearLocalAndLogOut() {
+            localStorage.clear();
+            window.location.replace("login.html");
+          }
+        </script>
+      </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+
+        <!-- Account 1 -->
+        <table class="table table-striped table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Account 1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row"></th>
+              <td>Account Number : </td>
+              <td id="accountnumber"></td>
+            </tr>
+            <tr>
+
+              <th scope="row"></th>
+              <td>Customer ID : </td>
+
+              <td id="customerID"></td>
+            </tr>
+            <tr>
+              <th scope="row"></th>
+              <td>Account Type </td>
+
+              <td id="accountType"></td>
+            </tr>
+            <tr>
+              <th scope="row"></th>
+              <td>Balance</td>
+
+              <td id="balance"></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <!--
+            POST Request : Create an Account
+      -->
+
+      <!--
+          Allow user to add their account here so we can use a get request to store
+          the second account that they
+      -->
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+              <h1 class="display-5">Add Account</h1>
+              <p class="lead">You can add account here</p>
+              <!-- button Add an account -->
+              <form id="addaccount" action="#" method="post">
+                <p>
+                  <input type="submit" value="Add Account" class="btn btn-primary btn-block" />
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+        <script>
+          // Add an account request
+            function toJSONString2() {
+                var obj = {};
+                obj.customerUID = parseInt(id);
+                return JSON.stringify( obj );
+              }
+            document.addEventListener( "DOMContentLoaded", function() {
+                var button = document.getElementById( "addaccount" );
+                button.addEventListener( "submit", function( e ) {
+                    e.preventDefault();
+                    var json = toJSONString2();
+                var tempId = id;
+                console.log(json);
+                $.ajax({
+                   url: "http://localhost:49000/api/account/create",
+                   type: "POST",
+                   data: json,
+                   dataType: "json",
+                   contentType: "application/json;",
+                   success: function (result) {
+                     swal({
+                        title: "You Added an Account!",
+                    });
+                }});
+                  }, false);
+              });
+      </script>
+        <!-- Lodge into account -->
+        <div class="container-fluid">
+          <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+              <h1 class="display-5">Lodge Money into Account!</h1>
+              <p class="lead">You Lodge money into one of your account</p>
+              <form id="addaccount" action="#" method="post">
+                <div class="form-group">
+                  <label for="uid">Your Account Number you are lodging into!</label>
+                  <input type="number" class="form-control" id="myaccountnumber" name="accountlodge" readonly>
+                  <script>
+                    document.getElementById("myaccountnumber").value = firstAccountNo;
+              </script>
+                </div>
+                <div class="form-group">
+                  <label for="uid">Amount</label>
+                  <input type="number" class="form-control" id="amountfield" name="amountfield" placeholder="Enter Amount">
+                </div>
+                <p>
+                  <input id="submit" type="submit" value="Lodge" class="btn btn-primary btn-block" />
+                </p>
+              </form>
+            </div>
+          </div>
+
+          <script>
+            // sourced here https://www.taniarascia.com/how-to-connect-to-an-api-with-javascript/
+        document.getElementById('submit').addEventListener('click', function(){
+          var idvar = document.getElementById("amountfield").value;
+
+          console.log(idvar);
+          console.log(firstAccountNo);
+          var request = new XMLHttpRequest();
+          request.open('POST', 'http://localhost:49000/api/account/lodge/'+firstAccountNo+'/'+idvar,true);
+          request.onload = function() {
+            var data = JSON.parse(this.response);
+            if (request.status >= 200 && request.status < 400) {
+                console.log("Success");
+            }
+          }
+          request.send();
+        });
+      </script>
+
+          <!-- Transfer from one account to another -->
+          <div class="container-fluid">
+            <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-5">Transfer Money From One Account to another</h1>
+                <p class="lead">You can transfer money from one account to another!</p>
+
+                <form id="transfer" action="#" method="post">
+                  <div class="form-group">
+                    <label for="uid">Your Account Number you are lodging from!</label>
+                    <input type="number" class="form-control" id="accountlodgeFrom" name="accountlodge" readonly>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="from"> The account you are sending to </label>
+                    <input type="number" class="form-control" id="to" name="to">
+                  </div>
+                  <div class="form-group">
+                    <label for="uid">Amount</label>
+                    <input type="number" class="form-control" id="a" name="a" placeholder="Enter Amount">
+                  </div>
+                  <p>
+                    <input id="sub" type="submit" value="Transfer" class="btn btn-primary btn-block" />
+                  </p>
+                </form>
+              </div>
+
+            </div>
+          </div>
+          <script>
+
+            /*
+        Transfer from one account to another
+    */
+    document.getElementById('sub').addEventListener('click', function(){
+      var a = document.getElementById("a").value;
+      var to = document.getElementById("to").value;
+
+      console.log(a);
+      console.log(firstAccountNo);
+      var request = new XMLHttpRequest();
+      request.open('POST', 'http://localhost:49000/api/account/transfer/'+firstAccountNo+'/'+to+'/'+a,true);
+      request.onload = function() {
+        //var data = JSON.parse(this.response);
+        if (request.status >= 200 && request.status < 400) {
+            console.log(data);
+        }
+      }
+      request.send();
+    });
+
+
+    </script>
+
+
+          <!-- Withdrawal Money -->
+          <div class="container-fluid">
+            <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-5">Withdraw Money</h1>
+                <p class="lead">Withdraw Money</p>
+
+                <form id="withdraw" action="#" method="post">
+                  <div class="form-group">
+                    <label for="uid">Your Account Number you are withdrawing from!</label>
+                    <input type="number" class="form-control" id="withdrawaid" name="withdrawaid">
+                    <script>
+                      document.getElementById("withdrawaid").value = firstAccountNo;
+               </script>
+
+                  </div>
+                  <div class="form-group">
+                    <label for="uid">Amount</label>
+                    <input type="number" class="form-control" id="withdrawamount" name="withdrawamount" placeholder="Enter Amount">
+                  </div>
+                  <p>
+                    <input id="subm" type="submit" value="Lodge" class="btn btn-primary btn-block" />
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
+          <script>
+            /* Withdraw money from account */
+ document.getElementById('subm').addEventListener('click', function(){
+   var withdrawamt = document.getElementById("withdrawamount").value;
+   var request = new XMLHttpRequest();
+
+   request.open('POST', 'http://localhost:49000/api/account/withdraw/'+firstAccountNo+'/'+withdrawamt,true);
+   request.onload = function() {
+     if (request.status >= 200 && request.status < 400) {
+         console.log("success");
+     }
+   }
+   request.send();
+ });
+
+ </script>
+          <!-- Get Balance of a specific Account -->
+          <div class="container-fluid">
+            <div class="jumbotron jumbotron-fluid">
+              <div class="container">
+                <h1 class="display-5">Get Balance of an account</h1>
+                <p class="lead">Get the balance of one of your accounts</p>
+
+                <form id="transfer" action="#" method="get">
+                  <div class="form-group">
+                    <label for="uid">Account Number you want the balance of</label>
+                    <input type="number" class="form-control" id="withbalanceaid" name="withbalanceaid">
+                  </div>
+                  <p>
+                    <input id="balancerequest" type="submit" value="Lodge" class="btn btn-primary btn-block" />
+                  </p>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!--
+        GET request
+    -->
+          <script>
+            /* pass in a account id */
+    document.getElementById('balancerequest').addEventListener('click', function(){
+        var a = document.getElementById("withbalanceaid").value;
+        console.log(a);
+        var request = new XMLHttpRequest();
+        request.open('GET', 'http://localhost:49000/api/account/balance/'+a,true);
+        request.onload = function() {
+          var dataB = JSON.parse(this.response);
+          console.log(dataB);
+          localStorage.setItem('RequestedAccountBalance', dataB);
+          if (request.status >= 200 && request.status < 400) {
+            /* Variables for our Customer we can store*/
+            localStorage.setItem('RequestedAccountBalanceFrom', a);
+            localStorage.setItem('RequestedAccountBalance', dataB);
+
+          }
+        }
+        request.send();
+    });
+
+
+
+    </script>
+
+          <!-- alert the balance -->
+          <table class="table table-striped table-dark">
+            <thead>
+              <tr>
+                <th scope="col">Requested Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row"></th>
+                <td>Account Number you requested from : </td>
+                <td id="RequestedAccountBalanceFrom"></td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Balance : </td>
+                <td id="RequestedAccountBalance"></td>
+              </tr>
+            </tbody>
+          </table>
+          <script>
+
+            var reqBal = localStorage.getItem('RequestedAccountBalance');
+        var reqAID = localStorage.getItem('RequestedAccountBalanceFrom');
+
+        document.getElementById("RequestedAccountBalanceFrom").innerHTML = reqAID;
+        document.getElementById("RequestedAccountBalance").innerHTML = reqBal;
+
+    </script>
+
+          <!-- delete account -->
+          <!-- DELETE ACCOUNT -->
+          <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+              <form id="deleteaccounnt" action="#" method="post">
+                <button type="submit" class="btn btn-danger btn-lg btn-block">Delete Account</button>
+              </form>
+            </div>
+          </div>
+          <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              var button = document.getElementById("deleteaccounnt");
+              // thanks to : https://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascript
+              // sourced from this link
+              var n = firstAccountNo;
+              var obj = new Object();
+              obj.accountNo = parseInt(n);
+
+              button.addEventListener("submit", function(e) {
+                e.preventDefault();
+
+                var json = JSON.stringify(obj);
+                console.log(json);
+                $.ajax({
+                  url: "http://localhost:49000/api/account/delete",
+                  type: "DELETE",
+                  data: json,
+                  dataType: "json",
+                  contentType: "application/json;",
+                  success: function(result) {
+                    swal({
+                      title: "You Deleted your Account!",
+                    }).then(function() {
+
+                      window.location.replace("index.html");
+                    });
+
+                  }
+                });
+              }, false);
+            });
+          </script>
+
+
+
+
+        </div>
+        <!-- /#page-content-wrapper -->
+
+      </div>
+      <!-- /#wrapper -->
+
+      <!-- Bootstrap core JavaScript -->
+      <script src="vendor/jquery/jquery.min.js"></script>
+      <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+      <!-- Menu Toggle Script -->
+      <!-- always on -->
+      <script>
+        $(function() {
+          $("#wrapper").toggleClass("toggled");
+        });
+      </script>
+      <!-- local storage show details in the tables -->
+      <script>
+        document.getElementById("myaccountnumber").value = firstAccountNo;
+        document.getElementById("accountlodgeFrom").value = firstAccountNo;
+      </script>
+
+</body>
+
+</html>

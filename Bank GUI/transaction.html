@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<script>
+  var fname = localStorage.getItem('Customer Fname');
+  var lname = localStorage.getItem('Customer Lname');
+</script>
+<html lang="en">
+<!--
+sourced here : https://startbootstrap.com/template-overviews/simple-sidebar/
+-->
+
+<head>
+
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Banking API</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+</head>
+
+<script type="text/javascript">
+  /* GET Transactions by ID*/
+  var request = new XMLHttpRequest();
+
+  var accounID = localStorage.getItem('First Account Number');
+  var url = "http://localhost:49000/api/transaction/account/" + accounID;
+  request.open('GET', url, true);
+  request.onload = function() {
+    var data = JSON.parse(this.response);
+    if (request.status >= 200 && request.status < 400) {
+      /*Store account information in localstorage*/
+      console.log(data);
+      //localStorage.setItem('transactions', data);
+      popTable(data);
+
+    }
+  }
+  request.send();
+</script>
+
+<body>
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <h4 id="welcomemessage" style="color:white;"></h4>
+          <script>
+            document.getElementById("welcomemessage").innerHTML = fname + " " + lname;
+          </script>
+
+        </li>
+        <li>
+          <a href="index.html" class="active">My Details</a>
+        </li>
+        <li>
+          <a href="account.html">My Account</a>
+        </li>
+        <li>
+          <a href="transaction.html">My Transactions</a>
+        </li>
+        <li>
+          <a href="AllTransactionsBook.html" class="active">All Transactions</a>
+        </li>
+        <br />
+        <li>
+          <button type="button" class="btn btn-light" id="logout">LOG OUT</button>
+        </li>
+        <script>
+          // Clear local storage first then redirect to login
+          document.getElementById("logout").onclick = function() {
+            clearLocalAndLogOut();
+          }
+
+          function clearLocalAndLogOut() {
+            localStorage.clear();
+            window.location.replace("login.html");
+          }
+        </script>
+      </ul>
+    </div>
+    <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+      <div class="container-fluid">
+        <table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">TID</th>
+              <th scope="col">To</th>
+              <th scope="col">From</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Date</th>
+              <th scope="col">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <tr>
+                  <th scope="row">1</th>
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>@mdo</td>
+                </tr> -->
+            <script>
+              function popTable(data)
+                    {
+                        //console.log(data);
+                        for(var dataItem in data) {
+                            var item = data[dataItem];
+                            console.log(item);
+                            // insert into relevant fields in our table
+                            $('table').append('<tr><td>'+data[dataItem].transactionID+'</td><td>'+data[dataItem].transactionTo+'</td><td>'+data[dataItem].transactionFrom+'</td><td>'+data[dataItem].amount+'</td><td>'+data[dataItem].transactionDate+'</td><td>'+data[dataItem].type+'</td></tr>');
+                        }
+                    }
+
+                </script>
+          </tbody>
+        </table>
+      </div><!-- end of fluid container containing the table -->
+      <!-- Create Transactions -->
+      <div class="container-fluid">
+        <div class="jumbotron jumbotron-fluid">
+          <div class="container">
+            <h1 class="display-5">Create a Transaction</h1>
+            <p class="lead">Create your transaction</p>
+            <form id="maketransaction" action="#" method="post">
+              <div class="form-group">
+                <label for="uid">Your Account Number you are transacting from</label>
+                <input type="number" class="form-control" id="myaccountnumber" name="transactionFrom" readonly>
+                <script>
+                  var firstAccountNo = localStorage.getItem("First Account Number");
+                      document.getElementById("myaccountnumber").value = firstAccountNo;
+                    </script>
+              </div>
+              <div class="form-group">
+                <label for="uid">The Account Number you are transacting to</label>
+                <input type="number" class="form-control" id="accountnumbertotransactto" name="transactionTo">
+              </div>
+              <div class="form-group">
+                <label for="uid">Message</label>
+                <input type="text" class="form-control" id="msg" name="message">
+              </div>
+              <div class="form-group">
+                <label for="uid">Date</label>
+                <input type="text" class="form-control" id="date" name="transactionDate" readonly>
+              </div>
+              <div class="form-group">
+                <label for="uid">Amount</label>
+                <input type="number" class="form-control" id="amountfield" name="amount" placeholder="Enter Amount">
+              </div>
+              <p>
+                <input id="submit" type="submit" value="Create Transaction" class="btn btn-primary btn-block" />
+              </p>
+            </form>
+
+            <script>
+              // create our transaction json object and post http
+                  (function() {
+                	function toJSONString( form ) {
+                		var obj = {};
+                		var elements = form.querySelectorAll( "input" );
+                		for( var i = 0; i < elements.length; ++i ) {
+                			var element = elements[i];
+                			var name = element.name;
+                			var value = element.value;
+
+                			if( name ) {
+                				obj[ name ] = value;
+                			}
+                		}
+                    // turn string to id
+                    var to = obj.transactionTo;
+                    var amo = obj.amount;
+                    obj.transactionFrom = parseInt(firstAccountNo);
+                    obj.transactionTo = parseInt(to);
+                    obj.amount = parseInt(amo);
+
+                    obj.transactionDate = new Date().toJSON().slice(0,10);
+
+                		return JSON.stringify( obj );
+                	}
+
+                	document.addEventListener( "DOMContentLoaded", function() {
+                		var form = document.getElementById( "maketransaction" );
+                		//var output = document.getElementById( "output" );
+                		form.addEventListener( "submit", function( e ) {
+                			e.preventDefault();
+                			var json = toJSONString( this );
+
+                      console.log(json);
+                      $.ajax({
+                         url: "http://localhost:49000/api/transaction/create",
+                         type: "POST",
+                         data: json,
+                         dataType: "json",
+                         contentType: "application/json;",
+                         success: function (result) {
+                           swal({
+                              title: "You Made a transaction!",
+                            }).then(function(){
+                              // nothing
+                            });
+
+                      }});
+                		}, false);
+                	});
+                })();
+              </script>
+          </div>
+        </div>
+      </div>
+      <!-- make a direct debt -->
+      <div class="container-fluid">
+        <div class="jumbotron jumbotron-fluid">
+          <div class="container">
+            <h1 class="display-5">Make a Direct Debt</h1>
+            <p class="lead">Make a direct debt!</p>
+            <form id="makedirectdebit" action="#" method="post">
+              <div class="form-group">
+                <label for="uid">Your Account Number you are transacting from</label>
+                <input type="number" class="form-control" id="myaccountnumber1" name="transactionFrom" readonly>
+                <script>
+                  var firstAccountNo = localStorage.getItem("First Account Number");
+                    document.getElementById("myaccountnumber1").value = firstAccountNo;
+                  </script>
+              </div>
+              <div class="form-group">
+                <label for="uid">Message</label>
+                <input type="text" class="form-control" id="msg" name="message">
+              </div>
+              <div class="form-group">
+                <label for="uid">Date</label>
+                <input type="text" class="form-control" id="date" name="transactionDate" readonly>
+              </div>
+              <div class="form-group">
+                <label for="uid">Amount</label>
+                <input type="number" class="form-control" id="amountfield" name="amount" placeholder="Enter Amount">
+              </div>
+              <p>
+                <input id="submit" type="submit" value="Create Transaction" class="btn btn-primary btn-block" />
+              </p>
+            </form>
+            <script>
+              (function() {
+                  function toJSONString( form ) {
+                      var obj = {};
+                      var elements = form.querySelectorAll( "input" );
+                      for( var i = 0; i < elements.length; ++i ) {
+                          var element = elements[i];
+                          var name = element.name;
+                          var value = element.value;
+
+                          if( name ) {
+                              obj[ name ] = value;
+                          }
+                      }
+                  // turn string to id
+                  var amo = obj.amount;
+                  obj.transactionFrom = parseInt(firstAccountNo);
+                  obj.amount = parseInt(amo);
+
+                  obj.transactionDate = new Date().toJSON().slice(0,10);
+
+                      return JSON.stringify( obj );
+                  }
+
+                  document.addEventListener( "DOMContentLoaded", function() {
+                      var form1 = document.getElementById( "makedirectdebit" );
+                      //var output = document.getElementById( "output" );
+                      form1.addEventListener( "submit", function( e ) {
+                          e.preventDefault();
+                          var json1 = toJSONString( this );
+
+                    console.log(json1);
+                    $.ajax({
+                       url: "http://localhost:49000/api/transaction/create/directdebit",
+                       type: "POST",
+                       data: json1,
+                       dataType: "json",
+                       contentType: "application/json;",
+                       success: function (result) {
+                         swal({
+                            title: "You Direct Debt Transaction!",
+                          }).then(function(){
+                            // nothing
+                          });
+
+                    }});
+                      }, false);
+                  });
+              })();
+            </script>
+          </div>
+        </div>
+      </div>
+      <!-- make a top up -->
+      <div class="container-fluid">
+        <div class="jumbotron jumbotron-fluid">
+          <div class="container">
+            <h1 class="display-5">Make a Top Up</h1>
+            <p class="lead">Make a Top Up</p>
+            <form id="maketopup" action="#" method="post">
+              <div class="form-group">
+                <label for="uid">Your Account Number you are transacting from</label>
+                <input type="number" class="form-control" id="myaccountnumber2" name="transactionFrom" readonly>
+                <script>
+                  var firstAccountNo = localStorage.getItem("First Account Number");
+                  document.getElementById("myaccountnumber2").value = firstAccountNo;
+                </script>
+              </div>
+              <div class="form-group">
+                <label for="uid">Phone Number</label>
+                <input type="number" class="form-control" id="pnum" name="transactionTo">
+              </div>
+              <div class="form-group">
+                <label for="uid">Date</label>
+                <input type="text" class="form-control" id="date" name="transactionDate" readonly>
+              </div>
+              <div class="form-group">
+                <label for="uid">Amount</label>
+                <input type="number" class="form-control" id="amountfield" name="amount" placeholder="Enter Amount">
+              </div>
+              <p>
+                <input id="submit" type="submit" value="Create Transaction" class="btn btn-primary btn-block" />
+              </p>
+            </form>
+            <script>
+              (function() {
+                function toJSONString(form) {
+                  var obj = {};
+                  var elements = form.querySelectorAll("input");
+                  for (var i = 0; i < elements.length; ++i) {
+                    var element = elements[i];
+                    var name = element.name;
+                    var value = element.value;
+
+                    if (name) {
+                      obj[name] = value;
+                    }
+                  }
+                  // turn string to id
+                  var amo = obj.amount;
+                  var pnum = obj.transactionTo;
+                  obj.transactionFrom = parseInt(firstAccountNo);
+                  obj.amount = parseInt(amo);
+                  obj.transactionTo = parseInt(pnum);
+
+                  obj.transactionDate = new Date().toJSON().slice(0, 10);
+
+                  return JSON.stringify(obj);
+                }
+
+                document.addEventListener("DOMContentLoaded", function() {
+                  var form2 = document.getElementById("maketopup");
+                  //var output = document.getElementById( "output" );
+                  form2.addEventListener("submit", function(e) {
+                    e.preventDefault();
+                    var json2 = toJSONString(this);
+
+                    console.log(json2);
+                    $.ajax({
+                      url: "http://localhost:49000/api/transaction/create/mobiletopup",
+                      type: "POST",
+                      data: json2,
+                      dataType: "json",
+                      contentType: "application/json;",
+                      success: function(result) {
+                        swal({
+                          title: "You Topped up!",
+                        }).then(function() {
+                          // nothing
+                        });
+
+                      }
+                    });
+                  }, false);
+                });
+              })();
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Menu Toggle Script -->
+    <!-- always on -->
+    <script>
+      $(function() {
+        $("#wrapper").toggleClass("toggled");
+      });
+    </script>
+
+</body>
+
+</html>
